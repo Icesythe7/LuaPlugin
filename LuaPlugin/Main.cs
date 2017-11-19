@@ -9,8 +9,9 @@ using System.ComponentModel;
 using System.Configuration;
 using System.IO;
 using LuaPlugin.Lua;
+using wManager.Plugin;
 
-public class Main : wManager.Plugin.IPlugin
+public class Main : IPlugin
 {
     private bool _isLaunched;
     private readonly string _path = Environment.CurrentDirectory + "\\Scripts\\";
@@ -21,6 +22,9 @@ public class Main : wManager.Plugin.IPlugin
 
         _isLaunched = true;
 
+        Radar3D.Pulse();
+        Radar3D.OnDrawEvent += Radar3DOnDrawEvent;
+
         WatchForEvents();
 
         PluginLoop();
@@ -30,6 +34,8 @@ public class Main : wManager.Plugin.IPlugin
     {
 
         _isLaunched = false;
+
+        Radar3D.OnDrawEvent -= Radar3DOnDrawEvent;
 
         Logging.Write("[LuaPlugin] Disposed.");
     }
@@ -55,8 +61,6 @@ public class Main : wManager.Plugin.IPlugin
         {
             if (Products.InPause) continue;
 
-            LuaEnv.CallFunctionSafe("onTick");
-
             Thread.Sleep(10);
         }
 
@@ -76,6 +80,17 @@ public class Main : wManager.Plugin.IPlugin
             }
         };
 
+    }
+
+    public void Radar3DOnDrawEvent()
+    {
+        if (!_isLaunched || !Conditions.InGameAndConnected || !Conditions.ProductIsStartedNotInPause) return;
+
+        LuaEnv.CallFunctionSafe("onTick");
+
+        if (!_isLaunched || !Conditions.InGameAndConnectedAndAliveAndProductStartedNotInPause) return;
+
+        LuaEnv.CallFunctionSafe("onDraw");
     }
 
     private static PluginSettings GetSettings
