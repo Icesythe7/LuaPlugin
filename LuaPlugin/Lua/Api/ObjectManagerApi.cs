@@ -11,9 +11,14 @@ namespace LuaPlugin.Lua.Api
         /// </summary>
         public WoWLocalPlayer Me => ObjectManager.Me;
 
-        public void testfunc()
-        {
-            //Me.
-        }
+        /// <summary>
+        /// Returns our target object
+        /// </summary>
+        public WoWUnit Target => ObjectManager.Target;
+
+        /// <summary>
+        /// Returns our pet
+        /// </summary>
+        public WoWUnit Pet => ObjectManager.Pet;
     }
 }

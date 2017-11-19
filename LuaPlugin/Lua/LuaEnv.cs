@@ -28,6 +28,7 @@ namespace LuaPlugin.Lua
                 UserData.RegisterType<Spell>();
                 UserData.RegisterType<WoWLocalPlayer>();
                 UserData.RegisterType<WoWPlayer>();
+                UserData.RegisterType<WoWUnit>();
                 UserData.RegisterType<SpellManager>();
 
                 UserData.RegisterType<Vector3>();
