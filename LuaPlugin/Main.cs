@@ -56,6 +56,7 @@ public class Main : wManager.Plugin.IPlugin
             if (Products.InPause) continue;
 
             LuaEnv.CallFunctionSafe("onTick");
+
             Thread.Sleep(10);
         }
 
@@ -63,7 +64,6 @@ public class Main : wManager.Plugin.IPlugin
 
     public static void WatchForEvents()
     {
-
         EventsLuaWithArgs.OnEventsLuaWithArgs += (id, args) =>
         {
             if (id == LuaEventsId.UNIT_MANA)

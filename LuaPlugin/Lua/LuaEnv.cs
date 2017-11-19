@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using LuaPlugin.Lua.Api;
 using MoonSharp.Interpreter;
 using robotManager.Helpful;
@@ -29,6 +30,9 @@ namespace LuaPlugin.Lua
                 UserData.RegisterType<WoWPlayer>();
                 UserData.RegisterType<SpellManager>();
 
+                UserData.RegisterType<Vector3>();
+                UserData.RegisterType<Color>();
+
                 Script = new Script(CoreModules.Preset_SoftSandbox | CoreModules.LoadMethods)
                 {
                     Options =
@@ -40,7 +44,9 @@ namespace LuaPlugin.Lua
                 Script.Globals["objectManager"] = new ObjectManagerApi();
                 Script.Globals["spellManager"] = UserData.Create(typeof(SpellManager));
                 Script.Globals["spell"] = UserData.Create(typeof(Spell));
+                Script.Globals["color"] = UserData.Create(typeof(Color));
                 Script.Globals["game"] = new GameApi();
+                Script.Globals["draw"] = new DrawApi();
 
                 IsLuaEnvActive = true;
 

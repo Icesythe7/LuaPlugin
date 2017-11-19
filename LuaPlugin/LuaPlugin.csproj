@@ -39,6 +39,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -50,6 +51,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Lua\Api\DrawApi.cs" />
     <Compile Include="Lua\Api\GameApi.cs" />
     <Compile Include="Lua\LuaEnv.cs" />
     <Compile Include="Lua\Api\ObjectManagerApi.cs" />
