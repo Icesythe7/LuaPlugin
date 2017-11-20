@@ -1,7 +1,4 @@
 ﻿using robotManager.Helpful;
-using System.Threading;
-using robotManager.Products;
-using wManager.Wow.Enums;
 using wManager.Wow.Helpers;
 using wManager.Wow.ObjectManager;
 using System;
@@ -11,31 +8,23 @@ using System.IO;
 using LuaPlugin.Lua;
 using wManager.Plugin;
 
+// ReSharper disable once CheckNamespace
 public class Main : IPlugin
 {
-    private bool _isLaunched;
     private readonly string _path = Environment.CurrentDirectory + "\\Scripts\\";
 
     public void Initialize()
     {
         Logging.Write("[LuaPlugin] Started.");
 
-        _isLaunched = true;
-
-        Radar3D.Pulse();
-        Radar3D.OnDrawEvent += Radar3DOnDrawEvent;
-
-        WatchForEvents();
-
-        PluginLoop();
+        Start();
     }
 
     public void Dispose()
     {
+        LuaEnv.CallFunctionSafe("onStop");
 
-        _isLaunched = false;
-
-        Radar3D.OnDrawEvent -= Radar3DOnDrawEvent;
+        Radar3D.Stop();
 
         Logging.Write("[LuaPlugin] Disposed.");
     }
@@ -46,7 +35,7 @@ public class Main : IPlugin
     }
 
 
-    public void PluginLoop()
+    public void Start()
     {
         try
         {
@@ -57,40 +46,6 @@ public class Main : IPlugin
             Logging.WriteError(ex.Message);
         }
 
-        while (Products.IsStarted && _isLaunched)
-        {
-            if (Products.InPause) continue;
-
-            Thread.Sleep(10);
-        }
-
-    }
-
-    public static void WatchForEvents()
-    {
-        EventsLuaWithArgs.OnEventsLuaWithArgs += (id, args) =>
-        {
-            if (id == LuaEventsId.UNIT_MANA)
-            { 
-                LuaEnv.CallFunctionSafe("onManaChanged");
-            }
-            if (id == LuaEventsId.CHAT_MSG_SYSTEM)
-            {
-                Logging.Write("We Received a System Message.");
-            }
-        };
-
-    }
-
-    public void Radar3DOnDrawEvent()
-    {
-        if (!_isLaunched || !Conditions.InGameAndConnected || !Conditions.ProductIsStartedNotInPause) return;
-
-        LuaEnv.CallFunctionSafe("onTick");
-
-        if (!_isLaunched || !Conditions.InGameAndConnectedAndAliveAndProductStartedNotInPause) return;
-
-        LuaEnv.CallFunctionSafe("onDraw");
     }
 
     private static PluginSettings GetSettings
@@ -162,5 +117,4 @@ public class Main : IPlugin
             return false;
         }
     }
-
 }

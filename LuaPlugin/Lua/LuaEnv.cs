@@ -1,8 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using LuaPlugin.Lua.Api;
 using MoonSharp.Interpreter;
 using robotManager.Helpful;
+using wManager.Events;
 using wManager.Wow.Class;
 using wManager.Wow.Helpers;
 using wManager.Wow.ObjectManager;
@@ -33,11 +35,13 @@ namespace LuaPlugin.Lua
 
                 UserData.RegisterType<Vector3>();
                 UserData.RegisterType<Color>();
+                UserData.RegisterType<CancelEventArgs>();
 
                 Script = new Script(CoreModules.Preset_SoftSandbox | CoreModules.LoadMethods)
                 {
                     Options =
                     {
+                        CheckThreadAccess = false,
                         DebugPrint = Logging.Write
                     }
                 };
@@ -55,6 +59,15 @@ namespace LuaPlugin.Lua
                 {
                     Script.DoFile(path);
                     IsScriptLoaded = true;
+                    CallFunctionSafe("onStart");
+                    
+                    //Fight Callbacks
+                    FightEvents.OnFightLoop += OnFightLoop;
+                    FightEvents.OnFightStart += OnFightStart;
+                    FightEvents.OnFightEnd += OnFightEnd;
+                    //Draw Callbacks
+                    Radar3D.Pulse();
+                    Radar3D.OnDrawEvent += OnDraw;
                 }
                 catch (InterpreterException ex)
                 {
@@ -104,6 +117,44 @@ namespace LuaPlugin.Lua
             if (function.Type != DataType.Function) return;
 
             Script.Call(function, args);
+        }
+
+        /// <summary>
+        /// OnFightloop callback
+        /// </summary>
+        /// <param name="unit"></param>
+        /// <param name="cancelable"></param>
+        public static void OnFightLoop(WoWUnit unit, CancelEventArgs cancelable)
+        {
+            if (Conditions.InGameAndConnectedAndAliveAndProductStartedNotInPause)
+                CallFunctionSafe("onFightLoop", unit, cancelable);
+        }
+
+        /// <summary>
+        /// OnFightStart callback
+        /// </summary>
+        /// <param name="unit"></param>
+        /// <param name="cancelable"></param>
+        public static void OnFightStart(WoWUnit unit, CancelEventArgs cancelable)
+        {
+            if (Conditions.InGameAndConnectedAndAliveAndProductStartedNotInPause)
+                CallFunctionSafe("onFightStart", unit, cancelable);
+        }
+
+        /// <summary>
+        /// OnFightEnd callback
+        /// </summary>
+        /// <param name="sig"></param>
+        public static void OnFightEnd(ulong sig)
+        {
+            if (Conditions.InGameAndConnected && Conditions.ProductIsStartedNotInPause)
+                CallFunctionSafe("onFightEnd", sig);
+        }
+
+        public static void OnDraw()
+        {
+            if (Conditions.InGameAndConnected && Conditions.ProductIsStartedNotInPause)
+                CallFunctionSafe("onDraw");
         }
     }
 }

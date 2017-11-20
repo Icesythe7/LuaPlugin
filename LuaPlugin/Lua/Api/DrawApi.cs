@@ -9,7 +9,7 @@ namespace LuaPlugin.Lua.Api
     public class DrawApi
     {
         public void Line(Vector3 from, Vector3 to, Color color, int alpha = 255)
-        {  
+        {
             Radar3D.DrawLine(from, to, color, alpha);
         }
 
@@ -45,6 +45,21 @@ namespace LuaPlugin.Lua.Api
             var center = new Vector3(x1, y1, z1);
 
             Radar3D.DrawCircle(center, radius, color, filled, alpha);
+        }
+
+        public void Circle3D(Vector3 center, float radius, Color color, int quality = 360, int alpha = 255)
+        {
+            var segmentAngle = 2 * System.Math.PI / quality;
+
+            for (var segment = 0; segment < quality; segment++)
+            {
+                var startX = center.X + (float)System.Math.Sin(segmentAngle * segment) * radius;
+                var startY = center.Y + (float)System.Math.Cos(segmentAngle * segment) * radius;
+                var endX = center.X + (float)System.Math.Sin(segmentAngle * (segment + 1)) * radius;
+                var endY = center.Y + (float)System.Math.Cos(segmentAngle * (segment + 1)) * radius;
+
+                Line(startX, startY, center.Z, endX, endY, center.Z, color, alpha);
+            }
         }
 
         public void Text(dynamic txt, Vector3 pos, float size, Color color, int alpha = 255, FontFamily font = null)
